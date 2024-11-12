@@ -1,5 +1,5 @@
 # Main UI 
-from googlesearch import get_gemini_response,google_search,load_prompt
+from googlesearch import extract_gemini_response,google_search,load_prompt
 import streamlit as st
 
 
@@ -12,9 +12,9 @@ def main():
     # title of the User Interface 
     st.title("Search Anything you want")
     # Text Input field 
-    user_query = st.text_input("Enter your search:")
+    user_input = st.text_input("Enter your search:")
     # Checking if the user has entered the text in the textfield or not 
-    if user_query:
+    if user_input:
         
         with st.container():
             
@@ -22,7 +22,7 @@ def main():
             col1, col2 = st.columns(2)
             with st.spinner("Generating response..."):
                 # if the text is inputed by the user then getting the response from gemini 
-                gemini_response = get_gemini_response(user_query)
+                gemini_response = extract_gemini_response(user_input)
                 st.markdown(
                         """
                         <style>
@@ -43,7 +43,7 @@ def main():
             # Fetch Google Search results
             with col2:
                 with st.spinner("Fetching search results..."):
-                    search_results = google_search(user_query)
+                    search_results = google_search(user_input)
                 
                 st.subheader("Relevant Links as per the search:")
                 

@@ -3,7 +3,10 @@ from langchain.chains import LLMChain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv, dotenv_values
 import requests
-from langchain import LLMChain, PromptTemplate
+from langchain.chains import LLMChain
+from langchain_core.prompts import PromptTemplate
+
+# Loading the .env file for getting the access ot its all the variables
 load_dotenv()
 
 # Loading environment variables from .env file
@@ -27,19 +30,21 @@ def load_prompt():
     return prompt
 
 # Intialization of the Gemini model
-try: 
-    gemini_model = ChatGoogleGenerativeAI(model="gemini-pro",
-                             temperature=0.4)
-except Exception as e:
-    print("An error has occured in initalization of the gemini model", str(e))
-
+def intialize_model():
+    """ Intializing the gemini model to generate the response for user inputs"""
+    try: 
+        gemini_model = ChatGoogleGenerativeAI(model="gemini-pro",
+                                temperature=0.4)
+    except Exception as e:
+        print("An error has occured in initalization of the gemini model", str(e))
+    return gemini_model
 
     
-def get_gemini_response(user_query):
+def extract_gemini_response(user_query):
     """Get response from Gemini API using the .invoke() method."""
     prompt = load_prompt()
     prompt_template = PromptTemplate(template=prompt, input_variables=["user_query"])
-   
+    gemini_model = intialize_model()
     # Use the new .invoke() method
     try:
         chain = LLMChain(llm=gemini_model, prompt=prompt_template)
@@ -54,22 +59,22 @@ def get_gemini_response(user_query):
         return None
 
 
-def google_search(query):
-    """Fetch top 5 search results using Google's Custom Search API as per the user entered input """
+def google_search(user_input):
+    """Extract top 5 search results using Google's Custom Search API as per the user entered input """
     search_url = "https://www.googleapis.com/customsearch/v1"
-    params = {
+    parameter = {
         "key": GOOGLE_API_KEY,
         "cx": SEARCH_ENGINE_ID,
-        "q": query,
+        "q": user_input,
         "num": 5  
     }
     
     try:
-        response = requests.get(search_url, params=params)
+        response = requests.get(search_url, params=parameter)
         if response.status_code == 200:
             return response.json().get("items", [])
-    except requests.exceptions.RequestException as e:
-        st.error(f"Error fetching search results: {e}")
+    except Exception as e:
+        st.error(f"Error while extracting search results from google search: {e}")
     
     return []
 
