@@ -1,0 +1,1 @@
+"""Answer the query: {user_query},also give the **explaination about the search item in brief**"""
