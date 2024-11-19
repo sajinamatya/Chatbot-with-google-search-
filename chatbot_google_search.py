@@ -1,6 +1,7 @@
 import streamlit as st
 from langchain.chains import LLMChain
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.memory import ConversationSummaryMemory
 from dotenv import load_dotenv, dotenv_values
 import requests
 from langchain.chains import LLMChain
@@ -32,7 +33,8 @@ def load_prompt():
 # Intialization of the Gemini model
 def intialize_model():
     """ Intializing the gemini model to generate the response for user inputs"""
-    try: 
+    try:
+        
         gemini_model = ChatGoogleGenerativeAI(model="gemini-pro",
                                 temperature=0.4)
     except Exception as e:
@@ -40,37 +42,60 @@ def intialize_model():
     return gemini_model
 
     
+
 def extract_gemini_response(user_query):
-    """Get response from Gemini API using the .invoke() method."""
+    """response from gemini model """
+    
     prompt = load_prompt()
-    prompt_template = PromptTemplate(template=prompt, input_variables=["user_query"])
+    
+    #  prompt template
+    prompt_template = PromptTemplate(
+        template=prompt,
+        input_variables=["history", "user_query"]
+    )
+    
+    # Initialization of  the Gemini model
     gemini_model = intialize_model()
-    # Use the new .invoke() method
+    memory = ConversationSummaryMemory(llm=gemini_model)
+    # Initialization of buffer  memory 
+
+
+    #  LLMChain 
+    chain = LLMChain(
+        llm=gemini_model,
+        prompt=prompt_template,
+        memory=memory
+    )
+
     try:
-        chain = LLMChain(llm=gemini_model, prompt=prompt_template)
-  
-        # Invoke the Gemini model
-        response = chain.invoke({"user_query": user_query},return_only_outputs=True)
         
-       
-        return response['text']
+        
+            
+            # Get the response from  model
+            response = chain.invoke({"user_query": user_query})
+            
+           
+            return response['text'], memory
+    
     except Exception as e:
         st.error(f"Error: {str(e)}")
         return None
 
 
+
 def google_search(user_input):
     """Extract top 5 search results using Google's Custom Search API as per the user entered input """
-    search_url = "https://www.googleapis.com/customsearch/v1"
+    google_search_url = "https://www.googleapis.com/customsearch/v1"
+    search_query = f"online shopping of {user_input}  "
     parameter = {
         "key": GOOGLE_API_KEY,
         "cx": SEARCH_ENGINE_ID,
-        "q": user_input,
+        "q": search_query,
         "num": 5  
     }
     
     try:
-        response = requests.get(search_url, params=parameter)
+        response = requests.get(google_search_url, params=parameter)
         if response.status_code == 200:
             return response.json().get("items", [])
     except Exception as e:
