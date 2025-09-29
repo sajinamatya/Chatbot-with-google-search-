@@ -44,7 +44,7 @@ LLM_API_KEY=your_llm_api_key
 streamlit
 google-api-python-client
 python-dotenv
-openai  # or your preferred LLM library
+langchain-google-genai
 requests
 ```
 
@@ -128,7 +128,7 @@ Customize the chatbot behavior by modifying:
 
 - Streamlit for the amazing web framework
 - Google Custom Search API for search functionality
-- OpenAI/Anthropic for LLM capabilities
+- Gemini API for LLM capabilities
 
 
 **Note**: Remember to keep your API keys secure and never commit them to version control. Always use environment variables or secure secret management systems.
