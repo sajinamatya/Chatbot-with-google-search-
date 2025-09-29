@@ -117,9 +117,9 @@ streamlit run app.py
 
 Customize the chatbot behavior by modifying:
 
-- `system_prompt.txt`: Adjust the LLM behavior and response style
-- `config.py`: Configure search parameters and API settings
-- `app.py`: Modify UI layout and interaction flow
+- `prompt.txt`: Adjust the LLM behavior and response style
+- `chatbot_google_search.py`: Configure search parameters and API settings
+- `user_interface.py`: Modify UI layout and interaction flow
 
 
 
